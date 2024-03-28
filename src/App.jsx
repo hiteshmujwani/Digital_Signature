@@ -1,9 +1,10 @@
 import SignatureCanvas from "react-signature-canvas";
 import { ColorPicker, useColor } from "react-color-palette";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 function App() {
-  const [color, setColor] = useColor("#ffff");
-  const [image, setimage] = useState();
+  const [bgcolor, setBgcolor] = useState("black");
+  const [penColor, setPencolor] = useState("black");
+  const [type, settype] = useState("jpeg");
   const signatureCanvasRef = useRef(null);
 
   const clearSignature = () => {
@@ -11,10 +12,12 @@ function App() {
   };
 
   const downloadSignature = () => {
-    const SignatureImage = signatureCanvasRef.current.toDataURL("image/png");
+    const SignatureImage = signatureCanvasRef.current.toDataURL(
+      `image/${type}`
+    );
     const DownloadLink = document.createElement("a");
     DownloadLink.href = SignatureImage;
-    DownloadLink.download = "Sign.png";
+    DownloadLink.download = `Signature.${type}`;
     document.body.append = DownloadLink;
     DownloadLink.click();
     document.body.remove = DownloadLink;
@@ -39,16 +42,21 @@ function App() {
       alignItems: "center",
       gap: "10px",
     },
+    border: {
+      border: "2px solid black",
+    },
   };
+  useEffect(() => {}, [bgcolor, penColor]);
 
   return (
     <div style={style.sign}>
-      <SignatureCanvas
-        ref={signatureCanvasRef}
-        penColor="white"
-        canvasProps={{ width: 500, height: 200 }}
-        backgroundColor="black"
-      />
+      <div style={style.border}>
+        <SignatureCanvas
+          ref={signatureCanvasRef}
+          penColor={penColor}
+          canvasProps={{ width: 500, height: 200 }}
+        />
+      </div>
       <div style={style.divcon}>
         <button style={style.button} onClick={clearSignature}>
           Clear Signature
@@ -57,10 +65,21 @@ function App() {
           Download Signature
         </button>
       </div>
-      <div>
-        <input type="text" placeholder="Enter Background Color" />
-        <input type="text" placeholder="Enter Pen Color" />
-        <select defaultValue={"jpeg"}>
+      <div style={style.divcon}>
+        <input
+          type="text"
+          value={penColor}
+          onChange={(e) => {
+            setPencolor(e.target.value);
+          }}
+          placeholder="Enter Pen Color"
+        />
+        <select
+          value={type}
+          onChange={(e) => {
+            settype(e.target.value);
+          }}
+        >
           <option value={"jpeg"}>jpeg</option>
           <option value={"png"}>png</option>
         </select>
